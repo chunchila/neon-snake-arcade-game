@@ -1,0 +1,20 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>נחש ניאון</title><style>*{box-sizing:border-box;margin:0}body{background:#0b1020;color:#fff;font-family:system-ui,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;touch-action:manipulation;user-select:none}h1{font-size:22px;margin:12px 0 4px}#hud{display:flex;gap:18px;margin:6px;font-size:18px}canvas{background:#111936;border-radius:12px;max-width:96vw;box-shadow:0 0 30px #4af3}button{background:#38bdf8;border:0;border-radius:10px;padding:10px 20px;font-size:17px;font-weight:700;margin:8px;cursor:pointer}p{opacity:.7;font-size:14px;margin:4px}</style></head><body>
+<h1>🐍 נחש ניאון</h1><div id="hud"><span>ניקוד: <b id="s">0</b></span><span>שיא: <b id="b">0</b></span></div>
+<canvas id="c" width="400" height="400"></canvas><p>חצים / WASD / החלקה על המסך</p><button id="r">התחל</button>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),G=20,S=20;let best=+localStorage.snakeBest||0;b.textContent=best;
+let sn,d,nd,f,sc,run,tick,bonus;
+function init(){sn=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];d=nd={x:1,y:0};sc=0;s.textContent=0;run=true;food();bonus=null;clearInterval(tick);tick=setInterval(step,110)}
+function food(){do{f={x:Math.random()*G|0,y:Math.random()*G|0}}while(sn.some(p=>p.x==f.x&&p.y==f.y))}
+function step(){if(!run)return;d=nd;const h={x:(sn[0].x+d.x+G)%G,y:(sn[0].y+d.y+G)%G};
+ if(sn.some(p=>p.x==h.x&&p.y==h.y)){run=false;if(sc>best){best=sc;localStorage.snakeBest=best;b.textContent=best}draw();return}
+ sn.unshift(h);if(h.x==f.x&&h.y==f.y){sc+=10;s.textContent=sc;food();if(sc%50==0){clearInterval(tick);tick=setInterval(step,Math.max(55,110-sc/5))}}else sn.pop();draw()}
+function draw(){x.fillStyle='#0a0f24';x.fillRect(0,0,400,400);x.strokeStyle='#ffffff08';for(let i=0;i<=G;i++){x.beginPath();x.moveTo(i*S,0);x.lineTo(i*S,400);x.moveTo(0,i*S);x.lineTo(400,i*S);x.stroke()}
+ x.shadowBlur=14;x.shadowColor='#f0f';x.fillStyle='#ff4fd8';x.beginPath();x.arc(f.x*S+10,f.y*S+10,7,0,7);x.fill();
+ sn.forEach((p,i)=>{x.shadowColor=x.fillStyle=`hsl(${160+i*4},100%,${i?55:75}%)`;x.fillRect(p.x*S+1,p.y*S+1,S-2,S-2)});x.shadowBlur=0;
+ if(!run){x.fillStyle='#000b';x.fillRect(0,150,400,100);x.fillStyle='#fff';x.font='bold 28px Arial';x.textAlign='center';x.fillText('הפסדת! '+sc+' נקודות',200,205)}}
+function turn(a,b2){if(a!=-d.x||b2!=-d.y){if(a||b2)nd={x:a,y:b2}}}
+addEventListener('keydown',e=>{const m={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]}[e.key];if(m){e.preventDefault();turn(...m)}});
+let t0;c.addEventListener('touchstart',e=>{t0=e.touches[0]},{passive:true});c.addEventListener('touchmove',e=>{e.preventDefault();if(!t0)return;const t=e.touches[0],dx=t.clientX-t0.clientX,dy=t.clientY-t0.clientY;if(Math.hypot(dx,dy)>24){Math.abs(dx)>Math.abs(dy)?turn(Math.sign(dx),0):turn(0,Math.sign(dy));t0=t}},{passive:false});
+r.onclick=init;init();
+</script></body></html>
